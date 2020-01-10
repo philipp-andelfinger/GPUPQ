@@ -1,0 +1,13 @@
+TARGET     = gdes
+BUILD_PATH = ../build
+BIN_PATH = ../bin
+ROOT_DIR := $(realpath ..)
+
+OPT  = -O3
+#DBG  = -g
+#CUDBG = -G
+WARN = -Wall -Werror
+ETC  = -std=c++11
+
+CUARCH = -arch=sm_52
+CUDAROOT  = /usr/local/cuda

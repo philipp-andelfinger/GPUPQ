@@ -1,0 +1,162 @@
+#pragma once
+
+// ---------------------------
+// Queue implementations:
+// Choose which queue implementation gets used
+// ---------------------------
+
+// #define _GLOBAL_ARRAY_QUEUE
+// #define _HEAP_QUEUE
+//#define _LOCAL_ARRAY_QUEUE
+//#define _LOCAL_ARRAY_QUEUE_BACKED_BY_HEAP
+//#define _LOCAL_HEAP_QUEUE
+#define _LOCAL_SPLAY_QUEUE
+
+
+// ---------------------------
+// Model implementations:
+// Choose which model implementation gets used
+// ---------------------------
+
+//#define _PHOLD
+#define _A_STAR
+
+// ---------------------------
+// Simulator features
+// ---------------------------
+
+// if VERBOSE, print the number of past events every PRINT_STATUS_INTERVAL in seconds of wall clock time
+#define VERBOSE 1
+#define PRINT_STATUS_INTERVAL 2
+
+#define VERBOSE_DEBUG 0
+
+// Perform correctness checks that verify that the model is implemented correctly.
+// In case of PHOLD: Check after each step that time is increasing monotonically
+// and that there are as many enqueues as there are dequeues.
+// #define _CORRECTNESS_CHECKS
+
+// Collect and print timing statistics on the queue and model execution
+#define _TIMER
+
+
+// Maximum number of events processed after which the simulation gets stopped forcefully,
+// Set to 0 for no limit.
+#define MAX_EVENTS (1000)
+// #define MAX_EVENTS 0
+// Maximum simulation duration after which the simulation gets stopped forcefully,
+// measured in units of simulation time.
+// Set to 0 for no limit.
+#define MAX_TS 0
+// Maximum wall simulation duration after which the simulation gets stopped forcefully,
+// measured in seconds of wall clock time.
+// Set to 0 for no limit.
+#define MAX_WCT 600
+
+
+// ---------------------------
+// Queue and model config
+// ---------------------------
+
+#define DEVICE_MEMORY_MB 2000
+#define ENQUEUE_MAX 4 // per Thread/LP
+
+// lower bound for the time frame after which a processed event generates
+// a resulting new event for other nodes, in units of simulation time
+#define LOOKAHEAD 10
+
+#define NUM_LPS 2048
+#define NUM_NODES_PER_LP 1
+#define NUM_NODES (NUM_LPS * NUM_NODES_PER_LP)
+
+#define SEED 0
+
+#define PHOLD_LAMBDA 0.1
+#define PHOLD_POPULATION 32
+
+// Requires that there is only one global coordinate system
+// width of the map
+#define A_STAR_GRID_X 256
+// height of the map  
+#define A_STAR_GRID_Y 256
+
+#define A_STAR_OBSTACLES ((float)A_STAR_GRID_X * A_STAR_GRID_Y * 0.2)
+#define A_STAR_OBSTACLE_SIZE_MEAN 1
+#define A_STAR_TRACE_PATHS
+// how many agents to simulate in total
+#define NUM_AGENTS (1024 * 1024)
+// number of agents to simulate in parallel
+#define NUM_CONCURRENT_AGENTS NUM_LPS
+// maximal number of ol entries to look at in parallel per agent
+// for a 2D grid, this results in A_STAR_MAX_PARALLEL_OL_ENTRIES * 8 threads per agent block
+#define A_STAR_MAX_PARALLEL_OL_ENTRIES 8
+
+//#define A_STAR_WRITE_IMAGES
+#define A_STAR_WRITE_IMAGES_PERIOD 5
+
+#define HQ_NUM_QUEUES 1
+#define HQ_NODE_SIZE (256 * 1024)
+
+#ifdef _PHOLD
+#define QUEUE_SIZE ((PHOLD_POPULATION / (HQ_NODE_SIZE / NUM_LPS) / HQ_NUM_QUEUES) + 8)
+#else
+#define QUEUE_SIZE (A_STAR_GRID_X * A_STAR_GRID_Y / HQ_NODE_SIZE / HQ_NUM_QUEUES + 2)
+#endif
+
+//#define A_STAR_REALTIME_VISUALIZATION
+//#define A_STAR_REALTIME_VISUALIZATION_PATHS_ONLY
+
+#define _LAQ_INSERTION_SORT
+// #define LOCAL_ARRAY_QUEUE_UPDATE_ELEMENTS
+#define LOCAL_ARRAY_QUEUE_BACKED_BY_HEAP_ITEMS_MAX 1
+#define LOCAL_ARRAY_QUEUE_BACKED_BY_HEAP_ITEM_DIST_THRESHOLD 1000
+
+//#define LOCAL_ARRAY_QUEUE_PRINT_QUEUE_LENGTH
+
+// should be log2(FEL_SIZE), but cannot evaluate that at compile time
+#define QUICKSORT_STACK_SIZE (FEL_SIZE / 100 > 0 ? FEL_SIZE / 100 : 1)
+
+//#define LOCAL_ARRAY_QUEUE_PARALLEL_INSERT
+#define LOCAL_ARRAY_QUEUE_PARALLEL_INSERT_NUM_THREADS 64
+
+#define HQ_DYNAMIC_ALLOC_FEL
+#define HQ_DYNAMIC_ALLOC_INSERT_MERGE_BUFFER
+#define HQ_DYNAMIC_ALLOC_DELETE_UPDATE_BUFFER
+#define HQ_DYNAMIC_ALLOC_INSERT_PROCESS
+
+#define HQ_PARALLEL_PARTITION
+// #define HQ_CACHING_ALLOCATOR
+#define HQ_CACHING_ALLOCATOR_MEM_BLOCK_SIZE (1024)
+#define HQ_CACHING_ALLOCATOR_MAX_ALLOC_BLOCKS (100)
+#define HQ_PTHREADS
+
+
+// ---------------------------
+// CUDA Thread Settings
+// ---------------------------
+
+#define MAX_THREADS__PHOLD 256
+#define MAX_THREADS__LOCAL_ARRAY_QUEUE 256
+#define MAX_THREADS__HEAP_QUEUE 256
+#define MAX_THREADS__GLOBAL_ARRAY_QUEUE 256
+#define HQ_MGPU_STREAM_PER_NODE
+//#define LOCAL_ARRAY_QUEUE_SINGLE_PASS
+// needs sizeof(queue_item) * MAX_THREADS__LOCAL_ARRAY_QUEUE * LOCAL_ARRAY_QUEUE_SINGLE_PASS_MAX_ENQUEUE
+// amount of shared memory.
+// use 8 for PHOLD, 7 leave some of the 48KiB unused for A*
+#define LOCAL_ARRAY_QUEUE_SINGLE_PASS_MAX_ENQUEUE 8
+#define LOCAL_ARRAY_QUEUE_BACKWARD
+
+// #define LOCAL_ARRAY_QUEUE_SEQUENTIAL_UPDATE
+#define CUDA_DEVICE 0
+
+/* #define half float
+#define __half2float
+#define __float2half */
+
+
+#define NUM_AGENTS (1024 * 1024)
+#define NUM_CONCURRENT_AGENTS NUM_LPS
+
+//#define COUNT_COMPARISONS
+
